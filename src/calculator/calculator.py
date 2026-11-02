@@ -1,123 +1,55 @@
 class Calculator(object):
     _instance = None
-    # names of single-digit numbers: English, German, Spanish, Russian, Chinese
-    _digits = {
-        "zero": 0,
-        "one": 1,
-        "two": 2,
-        "three": 3,
-        "four": 4,
-        "five": 5,
-        "six": 6,
-        "seven": 7,
-        "eight": 8,
-        "nine": 9,
-        "null": 0,
-        "eins": 1,
-        "zwei": 2,
-        "drei": 3,
-        "vier": 4,
-        "fünf": 5,
-        "sechs": 6,
-        "sieben": 7,
-        "acht": 8,
-        "neun": 9,
-        "cero": 0,
-        "uno": 1,
-        "dos": 2,
-        "tres": 3,
-        "cuatro": 4,
-        "cinco": 5,
-        "seis": 6,
-        "siete": 7,
-        "ocho": 8,
-        "nueve": 9,
-        "ноль": 0,
-        "один": 1,
-        "два": 2,
-        "три": 3,
-        "четыре": 4,
-        "пять": 5,
-        "шесть": 6,
-        "семь": 7,
-        "восемь": 8,
-        "девять": 9,
-        "零": 0,
-        "一": 1,
-        "二": 2,
-        "三": 3,
-        "四": 4,
-        "五": 5,
-        "六": 6,
-        "七": 7,
-        "八": 8,
-        "九": 9,
+
+    NUMBERS = {
+        'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+        'null': 0, 'eins': 1, 'zwei': 2, 'drei': 3, 'vier': 4, 'fünf': 5, 'sechs': 6, 'sieben': 7, 'acht': 8, 'neun': 9,
+        'cero': 0, 'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9,
+        'ноль': 0, 'один': 1, 'два': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'восемь': 8, 'девять': 9,
+        '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9,
+        'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7, 'viii': 8, 'ix': 9, 'x': 10,
     }
 
-    # values of Latin (Roman) numerals
-    _roman = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+    def num(_self, x):
+        # Eingabe in Text umwandeln, Leerzeichen weg, alles klein
+        text = str(x).strip().lower()
 
+        # Suche in der Liste der definierten Zahlen
+        if text in _self.NUMBERS:
+            return _self.NUMBERS[text]
+
+        # Ist es eine ganze Zahl? ("1", "-3")
+        if text.lstrip('-').isdigit():
+            return int(text)
+
+        # Sonst Kommazahl ("1.600")
+        return float(text)
+    
     def add(_self, a, b):
-        return _self._num(a) + _self._num(b)
+        return _self.num(a) + _self.num(b)
 
     def sub(_self, a, b):
-        return _self._num(a) - _self._num(b)
+        return _self.num(a) - _self.num(b)
 
     def mul(_self, a, b):
-        return _self._num(a) * _self._num(b)
+        return _self.num(a) * _self.num(b)
 
     def div(_self, a, b):
-        return _self._num(a) / _self._num(b)
+        b = _self.num(b)
+        return _self.num(a) / b if b != 0 else None
 
     def factorize(_self, n):
-        n = _self._num(n)
+        n = _self.num(n)
         factors = []
-        p = 2
-        while p * p <= n:
-            while n % p == 0:
-                factors.append(p)
-                n //= p
-            p += 1
+        d = 2
+        while d * d <= n:
+            while n % d == 0:
+                factors.append(d)
+                n //= d
+            d += 1
         if n > 1:
             factors.append(n)
         return factors
 
-    # convert argument (number, digit string, number name, Roman numeral) to a number
-    def _num(_self, x):
-        if not isinstance(x, str):
-            return x
-        s = x.strip()
-        try:
-            return int(s)
-        except ValueError:
-            pass
-        try:
-            return float(s)
-        except ValueError:
-            pass
-        if s.lower() in _self._digits:
-            return _self._digits[s.lower()]
-        if s and all(c in _self._roman for c in s.upper()):
-            return _self._from_roman(s.upper())
-        raise ValueError(f'not a number: "{x}"')
-
-    # convert Roman numeral, e.g. "IV" -> 4
-    def _from_roman(_self, s):
-        total = 0
-        for i, c in enumerate(s):
-            v = _self._roman[c]
-            if i + 1 < len(s) and v < _self._roman[s[i + 1]]:
-                total -= v
-            else:
-                total += v
-        return total
-
     def __init__(self):
         pass
-
-    # Singleton pattern by overloading the new operator, see
-    # https://stackoverflow.com/questions/31875/is-there-a-simple-elegant- way-to-define-singletons
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
